@@ -1,23 +1,43 @@
 import { getAllStudents } from "./client";
 import React, { Component } from "react";
-import { Table, Avatar } from "antd";
-import Container from "./Container";
+import { LoadingOutlined } from "@ant-design/icons";
+import { Table, Avatar, Spin, Flex } from "antd";
+import Container from "./static/Container";
+import Loading from "./static/Loading";
 
 class App extends Component {
-  state = { student: [] };
+  state = { student: [], isFetching: false };
 
   componentDidMount() {
     this.fetchStudents();
   }
   fetchStudents = () => {
+    this.setState({ isFetching: true });
     getAllStudents().then((res) =>
       res.json().then((student) => {
-        this.setState({ student });
+        this.setState({ student, isFetching: false });
       })
     );
   };
   render() {
-    const { student } = this.state;
+    const { student, isFetching } = this.state;
+
+    if (isFetching) {
+      return (
+        <Loading>
+          <Spin
+            indicator={
+              <LoadingOutlined
+                style={{
+                  fontSize: 120,
+                }}
+                spin
+              />
+            }
+          />
+        </Loading>
+      );
+    }
     if (student && student.length) {
       const column = [
         {
@@ -39,6 +59,7 @@ class App extends Component {
             </Avatar>
           ),
         },
+        {},
         {
           title: "StudentId",
           dataIndex: "studentId",
@@ -55,6 +76,11 @@ class App extends Component {
           title: "Last name",
           dataIndex: "familyname",
           key: "familyname",
+        },
+        {
+          title: "Gender",
+          dataIndex: "gender",
+          key: "gender",
         },
 
         {
